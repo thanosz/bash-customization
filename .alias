@@ -1,0 +1,38 @@
+if which batcat > /dev/null; then alias cat="batcat --pager none"; fi
+if which exa > /dev/null; then alias ls="exa -g"; fi
+alias k=kubectl
+alias pscgroup="ps xawf -eo pid,user,cgroup,args"
+alias ip="ip -c"
+alias startx="startx & vlock"
+alias urxvt="urxvt -tn xterm -sl 30000 -bg black -fg white +tr -fn 'xft:ubuntumono:size=11' "
+
+alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
+alias kns=$'kubectl config set-context --current --namespace=$(k get ns | awk \'{print $1}\' | fzf)'
+alias kcurns="kubectl config view --minify --output 'jsonpath={..namespace}'"
+alias kpods='kubectl get pods'
+alias kall='kubectl get all'
+alias knode='kubectl get node'
+alias occtx='cp `find ~/.kube/configs -type f | fzf` ~/.kube/config'
+alias ocns=$'oc config set-context --current --namespace=$(oc get ns | awk \'{print $1}\' | fzf)'
+
+alias pdsh='noglob pdsh'
+#alias kcur='kubectl config current-context'
+alias gconf2='dconf-editor'
+alias k8sprompt='PROMPT_SEGMENT_POSITION=3 PROMPT_SEGMENT_NAME="prompt_k8s";\
+AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\
+unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
+alias list-terminal-colors='spectrum_ls'
+alias vagrant='podman run --rm -it \
+        --volume /run/libvirt:/run/libvirt \
+        --volume "${HOME}:${HOME}:rslave" \
+        --volume "${HOME}/.vagrant.d/boxes:/vagrant/boxes:rslave" \
+        --volume "${HOME}/.vagrant.d/data:/vagrant/data:rslave" \
+        --env "HOME=${HOME}" \
+        --volume /etc/exports:/etc/exports \
+        --workdir "$(pwd)" \
+        --net host \
+        --privileged \
+        --security-opt label=disable \
+        --entrypoint /usr/bin/vagrant \
+        docker.io/vagrantlibvirt/vagrant-libvirt:latest 2>/dev/null'
+alias notepadqq="flatpak run com.notepadqq.Notepadqq"
