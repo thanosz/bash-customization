@@ -1,3 +1,16 @@
+if [ -n "$DESKTOP_SESSION" ];then
+    eval $(gnome-keyring-daemon --start)
+    export SSH_AUTH_SOCK
+fi
+export DOCKER_BUILDKIT=1
+[[ -z $HOME_PATH_SET ]] && export PATH=$HOME/.local/bin:$HOME/bin:$PATH
+export HOME_PATH_SET=1
+export PDSH_RCMD_TYPE=ssh
+export LIBVIRT_DEFAULT_URI="qemu:///system"
+
+[ -n "$SSH_CONNECTION" ] && unset SSH_ASKPASS
+export GIT_ASKPASS=
+
 if which batcat > /dev/null; then alias cat="batcat --pager none"; fi
 if which exa > /dev/null; then alias ls="exa -g"; fi
 alias k=kubectl
@@ -8,15 +21,16 @@ alias urxvt="urxvt -tn xterm -sl 30000 -bg black -fg white +tr -fn 'xft:ubuntumo
 
 alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
 alias kns=$'kubectl config set-context --current --namespace=$(k get ns | awk \'{print $1}\' | fzf)'
-alias kcurns="kubectl config view --minify --output 'jsonpath={..namespace}'"
+#alias kcurns="kubectl config view --output 'jsonpath={..namespace}'"
+alias kcurns="kubectl config view --output 'jsonpath={.current-context}' | cut -d / -f 1"
 alias kpods='kubectl get pods'
 alias kall='kubectl get all'
 alias knode='kubectl get node'
 alias occtx='cp `find ~/.kube/configs -type f | fzf` ~/.kube/config'
-alias ocns=$'oc config set-context --current --namespace=$(oc get ns | awk \'{print $1}\' | fzf)'
+#alias ocns=$'oc project $(oc get ns | awk \'{print $1}\' | fzf)'
 
 alias pdsh='noglob pdsh'
-#alias kcur='kubectl config current-context'
+alias kcur='kubectl config current-context'
 alias gconf2='dconf-editor'
 alias k8sprompt='PROMPT_SEGMENT_POSITION=3 PROMPT_SEGMENT_NAME="prompt_k8s";\
 AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\

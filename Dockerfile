@@ -19,10 +19,10 @@ ADD https://github.com/junegunn/fzf/releases/download/$FZF_VERSION/$FZF /work
 RUN tar -xf $FZF && \
      mkdir /bash-customization/fzf/bin && \
      mv fzf /bash-customization/fzf/bin   
-ADD .bashrc .alias /bash-customization
+ADD .bashrc .shellvars .tmux.conf /bash-customization
 RUN ln -sf /bash-customization /usr/local/share/bash-customization
 RUN cd /bash-customization/bash-it && ./install.sh -s 
-RUN chmod 777 /bash-customization/bash-it/enabled /bash-customization/bash-it/tmp
+RUN chmod 777 /bash-customization/bash-it/enabled /bash-customization/bash-it
 RUN cd / && tar -cvzf /bash-customization.tar.gz /bash-customization
 
 FROM alpine:3.13.5

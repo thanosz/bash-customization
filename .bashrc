@@ -102,4 +102,4 @@ ble-color-setface region_insert fg=26,bg=252
 ble-color-setface syntax_error fg=0,bg=203
 ble-color-setface filename_other fg=white
 
-source $INSTALL_DIR/bash-customization/.alias
+source $INSTALL_DIR/bash-customization/.shellvars
