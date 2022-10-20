@@ -1,6 +1,6 @@
 FROM ubuntu:20.04 AS build
 
-ENV FZF_VERSION 0.27.2
+ENV FZF_VERSION 0.34.0
 ENV FZF fzf-$FZF_VERSION-linux_amd64.tar.gz
 RUN mkdir /work /bash-customization
 WORKDIR /work
@@ -13,7 +13,9 @@ RUN git clone --recursive https://github.com/akinomyoga/ble.sh.git
 RUN make -C ble.sh install PREFIX=/bash-customization && \
      mv /bash-customization/share/blesh /bash-customization/ble.sh && \
      rm -r /bash-customization/share
-ADD fzf /bash-customization/fzf
+RUN git clone --depth=1 https://github.com/junegunn/fzf.git
+RUN mkdir /bash-customization/fzf && cp fzf/shell/* /bash-customization/fzf && rm -rvf fzf
+#ADD fzf /bash-customization/fzf
 RUN cd /bash-customization/fzf && ln -sf . shell
 ADD https://github.com/junegunn/fzf/releases/download/$FZF_VERSION/$FZF /work
 RUN tar -xf $FZF && \
