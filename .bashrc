@@ -86,7 +86,9 @@ PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
 export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node cwd"
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
-export PATH=$INSTALL_DIR/bash-customization/fzf/bin:$PATH
+if ! which fzf > /dev/null 2 >&1; then
+	export PATH=$INSTALL_DIR/bash-customization/fzf/bin:$PATH
+fi
 
 # Load ble.sh
 source $INSTALL_DIR/bash-customization/ble.sh/ble.sh 

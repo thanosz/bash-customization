@@ -1,9 +1,11 @@
+export HISTFILESIZE=
+export HISTSIZE=
 if [ -n "$DESKTOP_SESSION" ];then
     eval $(gnome-keyring-daemon --start)
     export SSH_AUTH_SOCK
 fi
 export DOCKER_BUILDKIT=1
-[[ -z $HOME_PATH_SET ]] && export PATH=$HOME/.local/bin:$HOME/bin:$PATH
+[[ -z $HOME_PATH_SET ]] && export PATH=$HOME/.local/bin:$HOME/bin:$PATH:/opt/xscreensaver/bin:$HOME/go/bin
 export HOME_PATH_SET=1
 export PDSH_RCMD_TYPE=ssh
 export LIBVIRT_DEFAULT_URI="qemu:///system"
@@ -11,8 +13,8 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 [ -n "$SSH_CONNECTION" ] && unset SSH_ASKPASS
 export GIT_ASKPASS=
 
-if which batcat > /dev/null; then alias cat="batcat --pager none"; fi
-if which exa > /dev/null; then alias ls="exa -g"; fi
+if which batcat > /dev/null 2>&1; then alias cat="batcat --pager none"; fi
+if which exa > /dev/null 2>&1; then alias ls="exa -g"; fi
 alias k=kubectl
 alias pscgroup="ps xawf -eo pid,user,cgroup,args"
 alias ip="ip -c"
@@ -20,9 +22,8 @@ alias startx="startx & vlock"
 alias urxvt="urxvt -tn xterm -sl 30000 -bg black -fg white +tr -fn 'xft:ubuntumono:size=11' "
 
 alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
-alias kns=$'kubectl config set-context --current --namespace=$(k get ns | awk \'{print $1}\' | fzf)'
-#alias kcurns="kubectl config view --output 'jsonpath={..namespace}'"
-alias kcurns="kubectl config view --output 'jsonpath={.current-context}' | cut -d / -f 1"
+#alias kns=$'kubectl config set-context --current --namespace=$(k get ns | awk \'{print $1}\' | fzf)'
+alias kns=$'NAMESPACE=$(kubectl get ns | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
 alias kpods='kubectl get pods'
 alias kall='kubectl get all'
 alias knode='kubectl get node'
@@ -30,13 +31,16 @@ alias occtx='cp `find ~/.kube/configs -type f | fzf` ~/.kube/config'
 #alias ocns=$'oc project $(oc get ns | awk \'{print $1}\' | fzf)'
 
 alias pdsh='noglob pdsh'
-alias kcur='kubectl config current-context'
+alias kcurns=$'kubectl config get-contexts  | grep \'^* \' | awk \'{print $5}\''
 alias gconf2='dconf-editor'
 alias k8sprompt='PROMPT_SEGMENT_POSITION=3 PROMPT_SEGMENT_NAME="prompt_k8s";\
 AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\
-unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
+#unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
 alias list-terminal-colors='spectrum_ls'
-alias vagrant='podman run --rm -it \
+alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
+
+alias vagrant='echo Note: you are using a docker image to run vagrant; \
+        docker run --rm -it \
         --volume /run/libvirt:/run/libvirt \
         --volume "${HOME}:${HOME}:rslave" \
         --volume "${HOME}/.vagrant.d/boxes:/vagrant/boxes:rslave" \
@@ -49,4 +53,19 @@ alias vagrant='podman run --rm -it \
         --security-opt label=disable \
         --entrypoint /usr/bin/vagrant \
         docker.io/vagrantlibvirt/vagrant-libvirt:latest 2>/dev/null'
-alias notepadqq="flatpak run com.notepadqq.Notepadqq"
+
+if [[ "$(uname)" == 'Darwin' ]]; then
+    unalias ip
+    unalias vagrant
+	alias xsd_open=open
+	alias find=gfind
+	alias brew-upgrade-casks="brew outdated --cask --verbose --greedy | grep -v '(latest)' | awk '{print \$1}' | xargs brew reinstall --cask"
+
+	if which glocate > /dev/null; then
+  		alias locate=glocate
+  		export LOCATE_PATH="$HOME/locatedb"
+	fi
+	if which gupdatedb > /dev/null; then 
+		alias updatedb='echo This is an alias; gupdatedb --localpaths="/Users /Applications /opt /" --prunepaths=/Volumes --output=$HOME/locatedb'
+	fi
+fi

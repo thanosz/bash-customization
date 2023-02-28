@@ -1,7 +1,8 @@
 FROM ubuntu:20.04 AS build
+ARG ARCH=amd64
 
 ENV FZF_VERSION 0.34.0
-ENV FZF fzf-$FZF_VERSION-linux_amd64.tar.gz
+ENV FZF fzf-$FZF_VERSION-linux_${ARCH}.tar.gz
 RUN mkdir /work /bash-customization
 WORKDIR /work
 
@@ -21,7 +22,7 @@ ADD https://github.com/junegunn/fzf/releases/download/$FZF_VERSION/$FZF /work
 RUN tar -xf $FZF && \
      mkdir /bash-customization/fzf/bin && \
      mv fzf /bash-customization/fzf/bin   
-ADD .bashrc .shellvars .tmux.conf /bash-customization
+ADD .bashrc .shellvars .tmux.conf /bash-customization/
 RUN ln -sf /bash-customization /usr/local/share/bash-customization
 RUN cd /bash-customization/bash-it && ./install.sh -s 
 RUN chmod 777 /bash-customization/bash-it/enabled /bash-customization/bash-it
