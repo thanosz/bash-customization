@@ -1,8 +1,9 @@
 FROM ubuntu:20.04 AS build
-ARG ARCH=amd64
+ARG TARGETARCH
+ARG TARGETVARIANT
 
-ENV FZF_VERSION 0.34.0
-ENV FZF fzf-$FZF_VERSION-linux_${ARCH}.tar.gz
+ENV FZF_VERSION 0.38.0
+ENV FZF fzf-$FZF_VERSION-linux_${TARGETARCH}${TARGETVARIANT}.tar.gz
 RUN mkdir /work /bash-customization
 WORKDIR /work
 
