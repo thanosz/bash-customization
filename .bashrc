@@ -7,14 +7,15 @@ case $- in
 esac
 
 # Path to the bash it configuration
-INSTALL_DIR=""
-if [[ -d $PWD/bash-customization ]]; then
-    INSTALL_DIR=$PWD
-else
+if [[ -z $INSTALL_DIR ]]; then
+    if [[ -d $PWD/bash-customization ]]; then
+        INSTALL_DIR=$PWD
+    fi
+fi
+if [[ -z $INSTALL_DIR ]]; then
     echo Run this command inside the parent folder of bash_customization or set it in INSTALL_DIR
     return
 fi
-
 export BASH_IT="$INSTALL_DIR/bash-customization/bash-it"
 
 # Lock and Load a custom theme file.
@@ -86,7 +87,7 @@ PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
 export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node cwd"
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
-if ! which fzf > /dev/null 2 >&1; then
+if ! which fzf > /dev/null 2>&1; then
 	export PATH=$INSTALL_DIR/bash-customization/fzf/bin:$PATH
 fi
 

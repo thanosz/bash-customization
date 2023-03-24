@@ -38,6 +38,7 @@ AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSIT
 #unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
 alias list-terminal-colors='spectrum_ls'
 alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
+alias sgpt='docker run --rm -it -e OPENAI_API_KEY=CHANGEME -v gpt-cache:/tmp/shell_gpt ghcr.io/ther1d/shell_gpt'
 
 alias vagrant='echo Note: you are using a docker image to run vagrant; \
         docker run --rm -it \
@@ -55,8 +56,9 @@ alias vagrant='echo Note: you are using a docker image to run vagrant; \
         docker.io/vagrantlibvirt/vagrant-libvirt:latest 2>/dev/null'
 
 if [[ "$(uname)" == 'Darwin' ]]; then
-    unalias ip
-    unalias vagrant
+	unalias ip
+	unalias vagrant
+        export HOMEBREW_CASK_OPTS=--no-quarantine
 	alias xsd_open=open
 	alias find=gfind
 	alias brew-upgrade-casks="brew outdated --cask --verbose --greedy | grep -v '(latest)' | awk '{print \$1}' | xargs brew reinstall --cask"
