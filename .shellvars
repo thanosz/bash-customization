@@ -13,7 +13,8 @@ export LIBVIRT_DEFAULT_URI="qemu:///system"
 [ -n "$SSH_CONNECTION" ] && unset SSH_ASKPASS
 export GIT_ASKPASS=
 
-if which batcat > /dev/null 2>&1; then alias cat="batcat --pager none"; fi
+if which batcat > /dev/null 2>&1; then alias cat="batcat -p --pager none"; fi
+if which bat > /dev/null 2>&1; then alias cat="bat --theme 1337 -p --pager none"; fi
 if which exa > /dev/null 2>&1; then alias ls="exa -g"; fi
 alias k=kubectl
 alias pscgroup="ps xawf -eo pid,user,cgroup,args"
@@ -23,19 +24,23 @@ alias urxvt="urxvt -tn xterm -sl 30000 -bg black -fg white +tr -fn 'xft:ubuntumo
 
 alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
 #alias kns=$'kubectl config set-context --current --namespace=$(k get ns | awk \'{print $1}\' | fzf)'
-alias kns=$'NAMESPACE=$(kubectl get ns | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
+alias kns=$'NAMESPACE=$(kubectl get ns | grep -v NAME | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
 alias kpods='kubectl get pods'
 alias kall='kubectl get all'
 alias knode='kubectl get node'
-alias occtx='cp `find ~/.kube/configs -type f | fzf` ~/.kube/config'
+#alias occtx='cp `find ~/.kube/configs/ -type f | sort | fzf` ~/.kube/config'
 #alias ocns=$'oc project $(oc get ns | awk \'{print $1}\' | fzf)'
 
 alias pdsh='noglob pdsh'
 alias kcurns=$'kubectl config get-contexts  | grep \'^* \' | awk \'{print $5}\''
 alias gconf2='dconf-editor'
+alias dockerprompt='PROMPT_SEGMENT_POSITION=3 PROMPT_SEGMENT_NAME="prompt_docker";\
+	AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\
+	#unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
 alias k8sprompt='PROMPT_SEGMENT_POSITION=3 PROMPT_SEGMENT_NAME="prompt_k8s";\
-AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\
-#unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
+	AGNOSTER_PROMPT_SEGMENTS=("${AGNOSTER_PROMPT_SEGMENTS[@]:0:$PROMPT_SEGMENT_POSITION-1}" "$PROMPT_SEGMENT_NAME" "${AGNOSTER_PROMPT_SEGMENTS[@]:$PROMPT_SEGMENT_POSITION-1}");\
+	#unset PROMPT_SEGMENT_POSITION PROMPT_SEGMENT_NAME'
+
 alias list-terminal-colors='spectrum_ls'
 alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
 alias sgpt='docker run --rm -it -e OPENAI_API_KEY=CHANGEME -v gpt-cache:/tmp/shell_gpt ghcr.io/ther1d/shell_gpt'
@@ -55,6 +60,58 @@ alias vagrant='echo Note: you are using a docker image to run vagrant; \
         --entrypoint /usr/bin/vagrant \
         docker.io/vagrantlibvirt/vagrant-libvirt:latest 2>/dev/null'
 
+
+occtx () {
+  friendly=$(ls ~/.kube/configs/ | fzf)
+  [[ $friendly == "" ]] && return
+  selected=~/.kube/configs/$friendly
+  command=$(grep '#_#' $selected | cut -d ' ' -f 2-)
+  rm ~/.kube/config
+  if [[ $command == "" ]]; then
+    cp $selected ~/.kube/config
+    return
+  fi
+  [[ $(basename $SHELL) == "zsh" ]] && ${=command} || $command
+
+  cluster=$(echo $command | cut -d : -f 2 | sed 's|/||g')
+  setFriendlyName $cluster $friendly
+}
+
+oclogin () {
+  rm ~/.kube/config
+  oc login $@
+  echo "#_# oc login $@" >> ~/.kube/config
+  echo
+  echo "Type a friendly name (enter to cancel): \\c"
+  read friendly
+
+  if [[ $friendly != "" ]]; then
+    cluster=$(echo $@ | cut -d : -f 2 | sed 's|/||g')
+    setFriendlyName $cluster $friendly
+    cp ~/.kube/config ~/.kube/configs/$friendly
+  fi
+}
+
+setFriendlyName () {
+  cluster=$1
+  friendly=$2
+  sed="sed -i"
+  [[ "$(uname)" == 'Darwin' ]] && sed="sed -i '' -e"
+
+  
+  if [[ $(basename $SHELL) == "zsh" ]]; then
+    $=sed "s/name: ${cluster}:6443/name: ${friendly}/g" ~/.kube/config
+    $=sed "s/cluster: ${cluster}:6443/cluster: ${friendly}/g" ~/.kube/config
+  else
+    $sed "s/name: ${cluster}:6443/name: ${friendly}/g" ~/.kube/config
+    $sed "s/cluster: ${cluster}:6443/cluster: ${friendly}/g" ~/.kube/config
+  fi
+
+}
+
+
+
+################ MACOS #################
 if [[ "$(uname)" == 'Darwin' ]]; then
 	unalias ip
 	unalias vagrant
@@ -71,3 +128,7 @@ if [[ "$(uname)" == 'Darwin' ]]; then
 		alias updatedb='echo This is an alias; gupdatedb --localpaths="/Users /Applications /opt /" --prunepaths=/Volumes --output=$HOME/locatedb'
 	fi
 fi
+
+
+
+
