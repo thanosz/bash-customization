@@ -7,16 +7,14 @@ case $- in
 esac
 
 # Path to the bash it configuration
-if [[ -z $INSTALL_DIR ]]; then
-    if [[ -d $PWD/bash-customization ]]; then
-        INSTALL_DIR=$PWD
-    fi
-fi
-if [[ -z $INSTALL_DIR ]]; then
-    echo Run this command inside the parent folder of bash_customization or set it in INSTALL_DIR
+INSTALL_DIR=$HOME/bash-customization
+
+if [[ ! -d $INSTALL_DIR ]]; then
+    echo It is expected that bash-customization is under your HOME directiry, i.e. $INSTALL_DIR
     return
 fi
-export BASH_IT="$INSTALL_DIR/bash-customization/bash-it"
+
+export BASH_IT="$INSTALL_DIR/bash-it"
 
 # Lock and Load a custom theme file.
 # Leave empty to disable theming.
@@ -84,17 +82,18 @@ export SCM_CHECK=true
 
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
 
-export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node cwd"
+export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node k8s_context k8s_namespace cwd"
+export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node k8s_namespace cwd"
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
 if ! which fzf > /dev/null 2>&1; then
-	export PATH=$INSTALL_DIR/bash-customization/fzf/bin:$PATH
+	export PATH=$INSTALL_DIR/bin:$PATH
 fi
 
 # Load ble.sh
-source $INSTALL_DIR/bash-customization/ble.sh/ble.sh 
+source $INSTALL_DIR/ble.sh/ble.sh 
 # Integrage ble.sh with bash-it fzf
-_ble_contrib_fzf_base=$INSTALL_DIR/bash-customization/fzf
+_ble_contrib_fzf_base=$INSTALL_DIR/fzf
 ble-import -d contrib/fzf-completion
 ble-import -d contrib/fzf-key-bindings
 
@@ -105,4 +104,6 @@ ble-color-setface region_insert fg=26,bg=252
 ble-color-setface syntax_error fg=0,bg=203
 ble-color-setface filename_other fg=white
 
-source $INSTALL_DIR/bash-customization/.shellvars
+alias kns=$'NAMESPACE=$(kubectl get ns | grep -v NAME | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
+alias k=kubectl
+
