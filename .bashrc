@@ -105,5 +105,9 @@ ble-color-setface syntax_error fg=0,bg=203
 ble-color-setface filename_other fg=white
 
 alias kns=$'NAMESPACE=$(kubectl get ns | grep -v NAME | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
+alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
 alias k=kubectl
+alias list-terminal-colors='spectrum_ls'
+alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
+alias ip="ip -c"
 
