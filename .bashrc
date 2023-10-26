@@ -10,7 +10,7 @@ esac
 INSTALL_DIR=$HOME/bash-customization
 
 if [[ ! -d $INSTALL_DIR ]]; then
-    echo It is expected that bash-customization is under your HOME directiry, i.e. $INSTALL_DIR
+    echo It is expected that bash-customization is under your HOME directory, i.e. $INSTALL_DIR
     return
 fi
 
@@ -82,7 +82,7 @@ export SCM_CHECK=true
 
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
 
-export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node k8s_context k8s_namespace cwd"
+#export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node k8s_context k8s_namespace cwd"
 export POWERLINE_PROMPT="hostname user_info scm python_venv ruby node k8s_namespace cwd"
 # Load Bash It
 source "$BASH_IT"/bash_it.sh
@@ -90,8 +90,18 @@ if ! which fzf > /dev/null 2>&1; then
 	export PATH=$INSTALL_DIR/bin:$PATH
 fi
 
+if which oc >/dev/null 2>&1; then source <(oc completion bash); fi
+alias kns=$'NAMESPACE=$(kubectl get ns | grep -v NAME | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
+alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
+alias k=kubectl
+alias list-terminal-colors='spectrum_ls'
+alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
+alias ip="ip -c"
+
+
 # Load ble.sh
 source $INSTALL_DIR/ble.sh/ble.sh 
+
 # Integrage ble.sh with bash-it fzf
 _ble_contrib_fzf_base=$INSTALL_DIR/fzf
 ble-import -d contrib/fzf-completion
@@ -103,11 +113,4 @@ ble-color-setface auto_complete fg=white
 ble-color-setface region_insert fg=26,bg=252
 ble-color-setface syntax_error fg=0,bg=203
 ble-color-setface filename_other fg=white
-
-alias kns=$'NAMESPACE=$(kubectl get ns | grep -v NAME | awk \'{print $1}\' | fzf ); [[ -n ${NAMESPACE} ]] && kubectl config set-context --current --namespace=${NAMESPACE}'
-alias kctx='kubectl config use-context `k config get-contexts -o name | fzf`'
-alias k=kubectl
-alias list-terminal-colors='spectrum_ls'
-alias findbig='f(){ du -ahx $1 | sort -rh | head -40 }; f'
-alias ip="ip -c"
 
