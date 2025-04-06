@@ -7,7 +7,7 @@ case $- in
 esac
 
 # Path to the bash it configuration
-INSTALL_DIR=$(basename ${BASH_SOURCE[0]})
+INSTALL_DIR=$(dirname ${BASH_SOURCE[0]})
 
 
 export BASH_IT="$INSTALL_DIR/bash-it"
