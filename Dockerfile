@@ -21,7 +21,7 @@ RUN git clone --depth=1 https://github.com/junegunn/fzf.git
 RUN mkdir /bash-customization/fzf && cp fzf/shell/* /bash-customization/fzf && rm -rvf fzf
 #ADD fzf /bash-customization/fzf
 RUN cd /bash-customization/fzf && ln -sf . shell
-ADD https://github.com/junegunn/fzf/releases/download/v$FZF_VERSION/$FZF $WORKDIR
+ADD https://github.com/junegunn/fzf/releases/download/v$FZF_VERSION/$FZF .
 #ADD https://github.com/ahmetb/kubectx/releases/download/v0.9.5/kubectx_v0.9.5_linux_${TARGETARCH}${TARGETVARIANT}.tar.gz $WORKDIR
 
 RUN tar -xf $FZF && \
