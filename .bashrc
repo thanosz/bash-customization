@@ -7,12 +7,8 @@ case $- in
 esac
 
 # Path to the bash it configuration
-INSTALL_DIR=$HOME/bash-customization
+INSTALL_DIR=$(basename ${BASH_SOURCE[0]})
 
-if [[ ! -d $INSTALL_DIR ]]; then
-    echo It is expected that bash-customization is under your HOME directory, i.e. $INSTALL_DIR
-    return
-fi
 
 export BASH_IT="$INSTALL_DIR/bash-it"
 
