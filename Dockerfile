@@ -8,7 +8,7 @@ ENV KUBECTX=kubectx_v0.9.5_linux_${TARGETARCH}${TARGETVARIANT}.tar.gz
 RUN mkdir /work /bash-customization
 WORKDIR /work
 
-RUN apt update 
+RUN apt update
 RUN apt -y install xz-utils git make gawk
 
 RUN git clone --depth=1 https://github.com/Bash-it/bash-it.git /bash-customization/bash-it
@@ -26,7 +26,7 @@ ADD https://github.com/junegunn/fzf/releases/download/v$FZF_VERSION/$FZF .
 
 RUN tar -xf $FZF && \
      mkdir /bash-customization/bin && \
-     mv fzf /bash-customization/bin 
+     mv fzf /bash-customization/bin
 
 #RUN tar -xf kubectx_v0.9.5_linux_${TARGETARCH}${TARGETVARIANT}.tar.gz -C /bash-customization/bin kubectx
 
@@ -34,7 +34,7 @@ RUN tar -xf $FZF && \
 ADD .bashrc .tmux.conf /bash-customization/
 
 RUN ln -sf /bash-customization /usr/local/share/bash-customization
-RUN cd /bash-customization/bash-it && ./install.sh -s 
+RUN cd /bash-customization/bash-it && ./install.sh -s
 RUN chmod 777 /bash-customization/bash-it/enabled /bash-customization/bash-it
 RUN cd / && tar -cvzf /bash-customization.tar.gz /bash-customization
 

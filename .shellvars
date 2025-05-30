@@ -110,6 +110,11 @@ setFriendlyName () {
 }
 
 
+if [[ $(uname -o) == 'Cygwin' ]]; then
+	export MSYS=enable_pcon
+	alias vi=vim
+fi
+
 
 ################ MACOS #################
 if [[ "$(uname)" == 'Darwin' ]]; then
